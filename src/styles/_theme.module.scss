@@ -1,0 +1,15 @@
+@import "./colors.module";
+
+:root {
+  --font-color: #{$dark-color};
+  --background: #{$light-color};
+  --border-color: #{$border-color};
+  --primary-color: #{$primary-light-color};
+}
+
+[data-theme="dark"] {
+  --font-color: #{$light-color};
+  --background: #{$dark-color};
+  --border-color: #{$border-color};
+  --primary-color: #{$primary-dark-color};
+}
