@@ -14,7 +14,7 @@ export const allRecipes = [
 
 export const recipesPerWeek = [
   {
-    day: "monday",
+    day: "mon",
     recipes: [
       {
         name: "Chicken and Bean Taquitos",
@@ -30,7 +30,7 @@ export const recipesPerWeek = [
     ],
   },
   {
-    day: "tuesday",
+    day: "tues",
     recipes: [
       {
         name: "Chicken and Bean Taquitos",
@@ -46,7 +46,7 @@ export const recipesPerWeek = [
     ],
   },
   {
-    day: "wednesday",
+    day: "wed",
     recipes: [
       {
         name: "Roasted Veggies & Hummus",
@@ -62,7 +62,7 @@ export const recipesPerWeek = [
     ],
   },
   {
-    day: "thursday",
+    day: "thur",
     recipes: [
       {
         name: "Chicken and Bean Taquitos",
@@ -78,7 +78,7 @@ export const recipesPerWeek = [
     ],
   },
   {
-    day: "friday",
+    day: "fri",
     recipes: [
       {
         name: "Chicken and Bean Taquitos",

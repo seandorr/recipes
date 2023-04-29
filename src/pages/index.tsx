@@ -1,6 +1,8 @@
 import Head from "next/head";
 import { useLocalStorage } from "@/utils/customHooks/useLocalStorage";
 import { allRecipes, recipesPerWeek } from "@/utils/constants/recipes";
+import { Expand } from "@/components/icons/Expand";
+import { dayIndex } from "@/utils/functions/date";
 
 export default function Home() {
   const defaultDarkTheme = window.matchMedia(
@@ -23,8 +25,15 @@ export default function Home() {
         <div className="calendar-container">
           {recipesPerWeek.map((recipe, key) => {
             const { day, recipes } = recipe;
+
             return (
-              <div key={key} className="calendar-column" id={day}>
+              <div
+                key={key}
+                className={`calendar-column ${
+                  key + 1 === dayIndex ? "active" : ""
+                }`}
+                id={day}
+              >
                 <div className="calendar-title-container">
                   <h1 className="calendar-title">{day}</h1>
                 </div>
@@ -37,7 +46,13 @@ export default function Home() {
                         key={key}
                         className={`recipe ${units ? "has-units" : ""}`}
                       >
-                        {name}
+                        <div className="recipe-name-container">
+                          {name}
+                          <div className="expand-icon-container">
+                            <Expand size={14} />
+                          </div>
+                        </div>
+
                         {units && (
                           <div className="unit-container">
                             {units.length > 0 &&

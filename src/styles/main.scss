@@ -27,12 +27,40 @@ body {
       border-color: var(--border-color);
       overflow: auto;
 
+      &:first-child {
+        border-radius: 0.5rem 0 0 0.5rem;
+      }
+
+      &:last-child {
+        border-radius: 0 0.5rem 0.5rem 0;
+      }
+
+      &.active {
+        border-color: var(--primary-color);
+        z-index: 1;
+
+        .calendar-title {
+          &::after {
+            content: "today";
+            font-size: 0.7rem;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 0;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid var(--primary-color);
+          }
+        }
+      }
+
       .calendar-title-container {
         margin: 1rem;
         padding-bottom: 0.5rem;
         background-color: var(--background);
         position: sticky;
         top: 0;
+        z-index: 1;
 
         .calendar-title {
           text-transform: capitalize;
@@ -62,15 +90,15 @@ body {
         border: 1px solid var(--border-color);
         border-radius: 0.5rem;
         align-self: stretch;
+        position: relative;
 
-        &:not(.has-units) {
-          cursor: pointer;
-          transition: border-color 0.3s ease-in-out;
-          transition-delay: 75ms;
-          &:hover {
-            border-color: var(--primary-color);
-          }
-        }
+        // &:not(.has-units) {
+        //   transition: border-color 0.3s ease-in-out;
+        //   transition-delay: 75ms;
+        //   &:hover {
+        //     border-color: var(--primary-color);
+        //   }
+        // }
 
         .unit-container {
           margin-top: 1rem;
@@ -94,6 +122,38 @@ body {
 
             &:hover {
               border-color: var(--primary-color);
+            }
+          }
+        }
+
+        .recipe-name-container {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.5rem;
+
+          .expand-icon-container {
+            padding: 0.5rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+
+            svg {
+              g {
+                fill: $border-color;
+                transition: fill 0.3s ease-in-out;
+                transition-delay: 75ms;
+              }
+            }
+
+            &:hover {
+              svg {
+                g {
+                  fill: var(--primary-color);
+                }
+              }
             }
           }
         }

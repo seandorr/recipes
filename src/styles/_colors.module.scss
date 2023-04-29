@@ -5,3 +5,9 @@ $primary-light-color: #ff4242;
 // $border-hover-color: #ff4242;
 $border-hover-color: #42ff74;
 $light-color: #ededed;
+
+:export {
+  lightColor: $light-color;
+  expandColor: $primary-dark-color;
+  borderColor: $border-color;
+}
