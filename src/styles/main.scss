@@ -87,18 +87,17 @@ body {
       .recipe {
         margin: 1rem 0;
         padding: 1rem;
-        border: 1px solid var(--border-color);
+        border: 1px solid;
+        border-color: var(--border-color);
         border-radius: 0.5rem;
         align-self: stretch;
         position: relative;
+        transition: border-color 0.3s ease-in-out;
+        transition-delay: 75ms;
 
-        // &:not(.has-units) {
-        //   transition: border-color 0.3s ease-in-out;
-        //   transition-delay: 75ms;
-        //   &:hover {
-        //     border-color: var(--primary-color);
-        //   }
-        // }
+        &.hovering {
+          border-color: var(--primary-color);
+        }
 
         .unit-container {
           margin-top: 1rem;
@@ -119,6 +118,7 @@ body {
             cursor: pointer;
             transition: border-color 0.3s ease-in-out;
             transition-delay: 75ms;
+            position: relative;
 
             &:hover {
               border-color: var(--primary-color);
@@ -126,36 +126,9 @@ body {
           }
         }
 
-        .recipe-name-container {
-          display: flex;
-          align-items: flex-start;
-          gap: 0.5rem;
-
-          .expand-icon-container {
-            padding: 0.5rem;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            cursor: pointer;
-
-            svg {
-              g {
-                fill: $border-color;
-                transition: fill 0.3s ease-in-out;
-                transition-delay: 75ms;
-              }
-            }
-
-            &:hover {
-              svg {
-                g {
-                  fill: var(--primary-color);
-                }
-              }
-            }
-          }
+        .recipe-link {
+          color: var(--font-color);
+          text-decoration: none;
         }
       }
     }
@@ -211,6 +184,6 @@ body {
 
 .theme-buttons {
   position: absolute;
-  right: 3rem;
-  bottom: 3rem;
+  right: 2rem;
+  bottom: 2rem;
 }

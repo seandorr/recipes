@@ -1,8 +1,8 @@
 import Head from "next/head";
 import { useLocalStorage } from "@/utils/customHooks/useLocalStorage";
 import { allRecipes, recipesPerWeek } from "@/utils/constants/recipes";
-import { Expand } from "@/components/icons/Expand";
 import { dayIndex } from "@/utils/functions/date";
+import { useState } from "react";
 
 export default function Home() {
   const defaultDarkTheme = window.matchMedia(
@@ -12,6 +12,8 @@ export default function Home() {
     "theme",
     defaultDarkTheme ? "dark" : "light"
   );
+
+  const [hoveringRecipe, setHoveringRecipe] = useState({});
 
   return (
     <>
@@ -44,15 +46,18 @@ export default function Home() {
                     return (
                       <div
                         key={key}
-                        className={`recipe ${units ? "has-units" : ""}`}
+                        className={`recipe ${units ? "has-units" : ""} ${
+                          recipe === hoveringRecipe ? "hovering" : ""
+                        }`}
                       >
-                        <div className="recipe-name-container">
-                          {name}
-                          <div className="expand-icon-container">
-                            <Expand size={14} />
-                          </div>
-                        </div>
-
+                        <a
+                          href=""
+                          className="recipe-link"
+                          onMouseEnter={() => setHoveringRecipe(recipe)}
+                          onMouseLeave={() => setHoveringRecipe({})}
+                        >
+                          <span className="recipe-name">{name}</span>
+                        </a>
                         {units && (
                           <div className="unit-container">
                             {units.length > 0 &&

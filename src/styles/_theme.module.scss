@@ -3,13 +3,13 @@
 :root {
   --font-color: #{$dark-color};
   --background: #{$light-color};
-  --border-color: #{$border-color};
+  --border-color: #{$border-light-color};
   --primary-color: #{$primary-light-color};
 }
 
 [data-theme="dark"] {
   --font-color: #{$light-color};
   --background: #{$dark-color};
-  --border-color: #{$border-color};
+  --border-color: #{$border-dark-color};
   --primary-color: #{$primary-dark-color};
 }
