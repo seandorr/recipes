@@ -1,8 +1,6 @@
 import Head from "next/head";
 import { useLocalStorage } from "@/utils/customHooks/useLocalStorage";
-import { allRecipes, recipesPerWeek } from "@/utils/constants/recipes";
-import { dayIndex } from "@/utils/functions/date";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const defaultDarkTheme = window.matchMedia(
@@ -13,7 +11,23 @@ export default function Home() {
     defaultDarkTheme ? "dark" : "light"
   );
 
-  const [hoveringRecipe, setHoveringRecipe] = useState({});
+  const [recipes, setRecipes] = useState([]);
+
+  useEffect(() => {
+    getRecipes();
+  }, []);
+
+  const getRecipes = async () => {
+    try {
+      const response = await fetch("/api/recipe", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      setRecipes(await response.json());
+    } catch (error) {
+      console.error("Request error", error);
+    }
+  };
 
   return (
     <>
@@ -24,66 +38,17 @@ export default function Home() {
         {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
       <main className="main-container" data-theme={theme}>
-        <div className="calendar-container">
-          {recipesPerWeek.map((recipe, key) => {
-            const { day, recipes } = recipe;
+        <div className="recipes-container">
+          {recipes.map((recipe, key) => {
+            const { title } = recipe;
 
             return (
-              <div
-                key={key}
-                className={`calendar-column ${
-                  key + 1 === dayIndex ? "active" : ""
-                }`}
-                id={day}
-              >
-                <div className="calendar-title-container">
-                  <h1 className="calendar-title">{day}</h1>
-                </div>
-                <div className="gutter">
-                  {recipes.map((recipe, key) => {
-                    const { name, units } = recipe;
-
-                    return (
-                      <div
-                        key={key}
-                        className={`recipe ${units ? "has-units" : ""} ${
-                          recipe === hoveringRecipe ? "hovering" : ""
-                        }`}
-                      >
-                        <a
-                          href=""
-                          className="recipe-link"
-                          onMouseEnter={() => setHoveringRecipe(recipe)}
-                          onMouseLeave={() => setHoveringRecipe({})}
-                        >
-                          <span className="recipe-name">{name}</span>
-                        </a>
-                        {units && (
-                          <div className="unit-container">
-                            {units.length > 0 &&
-                              units.map((unit, key) => {
-                                return (
-                                  <button
-                                    key={key}
-                                    className="unit"
-                                    title={unit}
-                                  >
-                                    {unit}
-                                  </button>
-                                );
-                              })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+              <div key={key} className={`recipe`}>
+                {title}
               </div>
             );
           })}
-        </div>
-        {/* <div className="recipes-container">
-          {allRecipes.map((recipe, key) => {
+          {/* {allRecipes.map((recipe, key) => {
             const { name, units } = recipe;
 
             return (
@@ -103,8 +68,8 @@ export default function Home() {
                 )}
               </div>
             );
-          })}
-        </div> */}
+          })} */}
+        </div>
         <div className="theme-buttons">
           <button onClick={() => setTheme("light")}>Light</button>
           <button onClick={() => setTheme("dark")}>Dark</button>

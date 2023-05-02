@@ -4,11 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "db:local": "pscale connect recipes main --port 3309",
+    "schema:update": "npx prisma db push",
+    "schema:prod": "pscale branch promote recipes main",
+    "schema:view": "npx prisma studio",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "4.13.0",
     "@types/node": "18.15.11",
     "@types/react": "18.0.37",
     "@types/react-dom": "18.0.11",
@@ -20,6 +25,7 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
+    "prisma": "4.13.0",
     "sass": "^1.62.0"
   }
 }
