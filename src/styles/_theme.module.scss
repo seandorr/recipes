@@ -5,6 +5,7 @@
   --background: #{$light-color};
   --border-color: #{$border-light-color};
   --primary-color: #{$primary-light-color};
+  --tag-color: #{$tag-light-color};
 }
 
 [data-theme="dark"] {
@@ -12,4 +13,5 @@
   --background: #{$dark-color};
   --border-color: #{$border-dark-color};
   --primary-color: #{$primary-dark-color};
+  --tag-color: #{$tag-dark-color};
 }
