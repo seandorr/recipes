@@ -18,10 +18,7 @@ model Recipe {
 }
 
 model Tag {
-  id       Int     @id @default(autoincrement())
-  name     String
-  Recipe   Recipe? @relation(fields: [recipeId], references: [id])
-  recipeId Int?
-
-  @@index([recipeId])
+  id      Int      @id @default(autoincrement())
+  name    String
+  recipes Recipe[]
 }
