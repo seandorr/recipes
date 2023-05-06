@@ -1,9 +1,14 @@
 import type { AppProps } from "next/app";
 import "../styles/main.scss";
 import dynamic from "next/dynamic";
+import Layout from "@/components/Layout";
 
 const App = ({ Component, pageProps }: AppProps) => {
-  return <Component {...pageProps} />;
+  return (
+    <Layout>
+      <Component {...pageProps} />
+    </Layout>
+  );
 };
 
 export default dynamic(() => Promise.resolve(App), {
