@@ -1,6 +1,12 @@
+import RecipesTable from "@/components/Table";
 import Head from "next/head";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+
+export interface Recipe {
+  title: string;
+  tags: { id: number; name: string }[];
+}
 
 export default function Home() {
   const [recipes, setRecipes] = useState([]);
@@ -21,7 +27,20 @@ export default function Home() {
       .catch((error) => console.error("Request error", error));
   }, []);
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading)
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <>
@@ -31,17 +50,20 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
+      <div
+        className="ag-theme-alpine-dark ag-theme-custom"
+        style={{ width: "100%", height: 600 }}
+      >
+        <RecipesTable recipes={recipes} />
+      </div>
       <div className="recipes-container">
         <Link href="/create-recipe" className="button" id="create-recipe-btn">
           +
         </Link>
         {!isLoading &&
           recipes.length > 0 &&
-          recipes?.map((recipe, key) => {
-            const {
-              title,
-              tags,
-            }: { title: string; tags: { id: number; name: string }[] } = recipe;
+          recipes?.map((recipe: Recipe, key) => {
+            const { title, tags } = recipe;
 
             return (
               <div key={key} className={`recipe`}>
@@ -62,27 +84,6 @@ export default function Home() {
               </div>
             );
           })}
-        {/* {allRecipes.map((recipe, key) => {
-            const { name, units } = recipe;
-
-            return (
-              <div key={key} className={`recipe ${units ? "has-units" : ""}`}>
-                {name}
-                {units && (
-                  <div className="unit-container">
-                    {units.length > 0 &&
-                      units.map((unit, key) => {
-                        return (
-                          <button key={key} className="unit">
-                            {unit}
-                          </button>
-                        );
-                      })}
-                  </div>
-                )}
-              </div>
-            );
-          })} */}
       </div>
     </>
   );
