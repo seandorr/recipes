@@ -7,7 +7,7 @@ interface IData {
 }
 
 export const columnDefs = [
-  { field: "title" },
+  { field: "title", editable: true },
   {
     field: "tags",
     autoHeight: true,

@@ -50,12 +50,9 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
-      <div
-        className="ag-theme-alpine-dark ag-theme-custom"
-        style={{ width: "100%", height: 600 }}
-      >
-        <RecipesTable recipes={recipes} />
-      </div>
+
+      <RecipesTable recipes={recipes} />
+
       <div className="recipes-container">
         <Link href="/create-recipe" className="button" id="create-recipe-btn">
           +
