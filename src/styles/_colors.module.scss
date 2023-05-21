@@ -3,9 +3,15 @@ $border-dark-color: #5b5b5b;
 $border-light-color: #cbcbcb;
 $primary-dark-color: #42ff74;
 $primary-light-color: #ff4242;
+$edit-color: #00aeff;
 $primary-color-opacity: 0.15;
 $primary-dark-color-rgba: rgba($primary-dark-color, $primary-color-opacity);
 $primary-light-color-rgba: rgba($primary-light-color, $primary-color-opacity);
 $light-color: #ededed;
 $tag-dark-color: $border-dark-color;
 $tag-light-color: $border-light-color;
+
+:export {
+  editColor: $edit-color;
+  cancelColor: $primary-light-color;
+}

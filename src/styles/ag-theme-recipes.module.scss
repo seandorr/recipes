@@ -5,7 +5,8 @@
   --ag-border-color: var(--border-color);
   --ag-foreground-color: var(--font-color);
   --ag-alpine-active-color: var(--primary-color);
-  --ag-row-hover-color: var(--table-hover-color);
+  --ag-row-hover-color: transparent;
+  // --ag-row-hover-color: var(--table-hover-color);
   --ag-selected-row-background-color: rgba(33, 150, 243, 0.3);
   --ag-column-hover-color: rgba(33, 150, 243, 0.1);
   --ag-input-focus-border-color: rgba(33, 150, 243, 0.4);

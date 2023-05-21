@@ -1,3 +1,6 @@
+import { Tooltip } from "antd";
+import colors from "../../../styles/_colors.module.scss";
+
 interface IData {
   data: {
     id: number;
@@ -29,10 +32,21 @@ export const columnDefs = [
   {
     field: "actions",
     cellRenderer: ({ data }: IData) => {
+      const deleteRecipe = () => {
+        // TODO API call to delete recipe
+      };
       return (
         <div className="actions-container">
-          <button onClick={() => console.log(data)}>Edit</button>
-          <button>Delete</button>
+          <Tooltip title="Edit Recipe" color={colors.editColor}>
+            <button id="edit-btn" onClick={() => console.log(data)}>
+              <span className="material-symbols-outlined">edit</span>
+            </button>
+          </Tooltip>
+          <Tooltip title="Delete Recipe" color={colors.cancelColor}>
+            <button id="delete-btn" onClick={deleteRecipe}>
+              <span className="material-symbols-outlined">delete</span>
+            </button>
+          </Tooltip>
         </div>
       );
     },

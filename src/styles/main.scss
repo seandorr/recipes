@@ -232,7 +232,7 @@ body {
   .tag {
     border: 1px solid;
     border-color: var(--tag-color);
-    border-radius: 4px;
+    border-radius: 0.25rem;
     padding: 0.6rem;
     line-height: 0;
   }
@@ -243,6 +243,40 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+
+  button {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #808080;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    line-height: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    transition-delay: 75ms;
+    border: 1px solid;
+    border-color: transparent;
+
+    &#edit-btn {
+      &:hover {
+        color: $edit-color;
+        border-color: $edit-color;
+      }
+    }
+
+    &#delete-btn {
+      &:hover {
+        color: $primary-light-color;
+        border-color: $primary-light-color;
+      }
+    }
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
 }
 
 .theme-buttons {
