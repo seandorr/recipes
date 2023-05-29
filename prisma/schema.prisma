@@ -11,6 +11,12 @@ datasource db {
   relationMode = "prisma"
 }
 
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String
+  password String
+}
+
 model Recipe {
   id    Int    @id @default(autoincrement())
   title String
