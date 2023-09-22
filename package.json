@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "db:local": "pscale connect recipes main --port 3309",
+    "dev:local": "concurrently \"yarn dev\" \"yarn db:local\"",
     "schema:update": "npx prisma db push",
     "schema:prod": "pscale branch promote recipes main",
     "schema:view": "npx prisma studio",
@@ -13,7 +14,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@prisma/client": "4.13.0",
+    "@prisma/client": "^4.15.0",
     "@types/bcrypt": "^5.0.0",
     "@types/node": "18.15.11",
     "@types/react": "18.0.37",
@@ -22,6 +23,7 @@
     "ag-grid-react": "^29.3.5",
     "antd": "^5.5.0",
     "bcrypt": "^5.1.0",
+    "concurrently": "^8.0.1",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
     "jose": "^4.14.4",
@@ -31,7 +33,7 @@
     "typescript": "5.0.4"
   },
   "devDependencies": {
-    "prisma": "4.13.0",
+    "prisma": "^4.15.0",
     "sass": "^1.62.0"
   }
 }
