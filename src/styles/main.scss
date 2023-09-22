@@ -326,3 +326,17 @@ body {
     }
   }
 }
+
+.empty-container {
+  padding: 1rem 0;
+  background-color: var(--background);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ant-empty-description {
+    color: var(--font-color);
+  }
+}

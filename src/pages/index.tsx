@@ -1,4 +1,5 @@
 import RecipesTable from "@/components/Table";
+import { Empty } from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -50,16 +51,24 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
-
-      <RecipesTable recipes={recipes} />
+      {recipes?.length > 0 ? (
+        <RecipesTable recipes={recipes} />
+      ) : (
+        <div className="empty-container">
+          <Empty
+            description="No recipes"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          />
+        </div>
+      )}
 
       <div className="recipes-container">
         <Link href="/create-recipe" className="button" id="create-recipe-btn">
           +
         </Link>
         {!isLoading &&
-          recipes.length > 0 &&
-          recipes?.map((recipe: Recipe, key) => {
+          recipes?.length > 0 &&
+          recipes.map((recipe: Recipe, key) => {
             const { title, tags } = recipe;
 
             return (
