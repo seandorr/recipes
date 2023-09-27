@@ -22,7 +22,9 @@ export default async function handler(
 
 async function readRecipes(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const recipes = await prisma.recipe.findMany({ include: { tags: true } });
+    const recipes = await prisma.recipe.findMany({
+      include: { tags: true, instructions: true, ingredients: true },
+    });
     return res.status(200).json({ data: recipes, success: true });
   } catch (error) {
     console.error("Request error", error);
@@ -40,6 +42,22 @@ async function createRecipe(req: NextApiRequest, res: NextApiResponse) {
           create: [
             {
               name: "test",
+            },
+          ],
+        },
+        instructions: {
+          create: [
+            {
+              description: "test",
+            },
+          ],
+        },
+        ingredients: {
+          create: [
+            {
+              name: "apple",
+              quantity: 1,
+              unit: "unit",
             },
           ],
         },

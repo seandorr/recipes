@@ -18,13 +18,29 @@ model User {
 }
 
 model Recipe {
-  id    Int    @id @default(autoincrement())
-  title String
-  tags  Tag[]
+  id           Int           @id @default(autoincrement())
+  title        String
+  tags         Tag[]
+  instructions Instruction[]
+  ingredients  Ingredient[]
 }
 
 model Tag {
   id      Int      @id @default(autoincrement())
   name    String
   recipes Recipe[]
+}
+
+model Instruction {
+  id          Int      @id @default(autoincrement())
+  description String
+  recipes     Recipe[]
+}
+
+model Ingredient {
+  id       Int      @id @default(autoincrement())
+  name     String
+  quantity Int
+  unit     String
+  recipes  Recipe[]
 }

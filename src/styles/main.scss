@@ -233,7 +233,7 @@ body {
     border: 1px solid;
     border-color: var(--tag-color);
     border-radius: 0.25rem;
-    padding: 0.6rem;
+    padding: 0.8rem 0.5rem;
     line-height: 0;
   }
 }
@@ -280,7 +280,7 @@ body {
 }
 
 .theme-buttons {
-  position: absolute;
+  position: fixed;
   right: 2rem;
   bottom: 2rem;
 }

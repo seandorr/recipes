@@ -6,6 +6,8 @@ interface IData {
     id: number;
     title: string;
     tags: [{ id: number; name: string }];
+    ingredients: [{ id: number; name: string; quantity: number; unit: string }];
+    instructions: [{ id: number; description: string }];
   };
 }
 
@@ -22,6 +24,25 @@ export const columnDefs = [
             return (
               <span key={key} className="tag">
                 {tag.name}
+              </span>
+            );
+          })}
+        </div>
+      );
+    },
+  },
+  {
+    field: "ingredients",
+    autoHeight: true,
+    resizable: true,
+    cellRenderer: ({ data }: IData) => {
+      return (
+        <div className="ingredients-container">
+          {data.ingredients.map((ingredient, key: number) => {
+            return (
+              <span key={key}>
+                <span>{ingredient.quantity}</span>{" "}
+                <span>{ingredient.name}</span>
               </span>
             );
           })}
