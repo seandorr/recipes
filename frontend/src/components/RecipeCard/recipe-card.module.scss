@@ -1,0 +1,30 @@
+.recipeCard {
+  // overflow: hidden;
+  background-color: var(--dark-medium-color);
+  position: relative;
+  border: 1px solid var(--dark-light-color);
+  border-radius: 8px;
+}
+
+.recipeImg {
+  height: 250px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.recipeDetails {
+  padding: 1rem;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .tag {
+    background-color: var(--dark-light-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+}
