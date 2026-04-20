@@ -1,4 +1,5 @@
 import { RecipeCard } from "../../components/RecipeCard";
+import { activeDay } from "../../utils/functions/getDay";
 import styles from "./week.module.scss";
 
 type IRecipe = {
@@ -40,45 +41,82 @@ const mondayRecipes: IRecipe[] = [
   },
 ];
 
+type IWeekDayColumn = {
+  title: string;
+  meals: IRecipe[];
+  active: boolean;
+};
+
+const WeekDayColumn = ({ title, meals, active }: IWeekDayColumn) => {
+  return (
+    <div
+      className={`${styles.weekDayContainer} ${active ? styles.active : ""}`}
+    >
+      <div className={styles.weekDayTitleContainer}>
+        <h2 className={styles.weekDayTitle}>{title}</h2>
+        {active && (
+          <span className={styles.activeDayTag}>
+            <div className={styles.activeSymbol}></div>Hoy
+          </span>
+        )}
+      </div>
+      <div className={styles.recipesContainer}>
+        {meals.map((recipe, index) => {
+          const { title, tags } = recipe;
+
+          return (
+            <RecipeCard
+              className={styles.recipeCard}
+              key={index}
+              title={title}
+              tags={tags}
+              type="calendar"
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const Week = () => {
   return (
     <div className={styles.weekContainer}>
-      <div className={styles.weekDayContainer}>
-        <h2 className={styles.weekDayTitle}>Lunes</h2>
-        <div className={styles.recipesContainer}>
-          {mondayRecipes.map((recipe, index) => {
-            const { title, tags } = recipe;
-
-            return (
-              <RecipeCard
-                className={styles.recipeCard}
-                key={index}
-                title={title}
-                tags={tags}
-                type="calendar"
-              />
-            );
-          })}
-        </div>
-      </div>
-      <div className={styles.weekDayContainer}>
-        <h2 className={styles.weekDayTitle}>Martes</h2>
-      </div>
-      <div className={styles.weekDayContainer}>
-        <h2 className={styles.weekDayTitle}>Miercoles</h2>
-      </div>
-      <div className={styles.weekDayContainer}>
-        <h2 className={styles.weekDayTitle}>Jueves</h2>
-      </div>
-      <div className={styles.weekDayContainer}>
-        <h2 className={styles.weekDayTitle}>Viernes</h2>
-      </div>
-      <div className={styles.weekDayContainer}>
-        <h2 className={styles.weekDayTitle}>Sabado</h2>
-      </div>
-      <div className={styles.weekDayContainer}>
-        <h2 className={styles.weekDayTitle}>Domingo</h2>
-      </div>
+      <WeekDayColumn
+        title="Lunes"
+        meals={mondayRecipes}
+        active={activeDay === "monday"}
+      />
+      <WeekDayColumn
+        title="Martes"
+        meals={[]}
+        active={activeDay === "tuesday"}
+      />
+      <WeekDayColumn
+        title="Miércoles"
+        meals={[]}
+        active={activeDay === "wednesday"}
+      />
+      <WeekDayColumn
+        title="Jueves"
+        meals={[]}
+        active={activeDay === "thursday"}
+      />
+      <WeekDayColumn
+        title="Viernes"
+        meals={[]}
+        active={activeDay === "friday"}
+      />
+      <WeekDayColumn
+        title="Sábado"
+        meals={[]}
+        active={activeDay === "saturday"}
+      />
+      <WeekDayColumn
+        title="Domingo"
+        meals={[]}
+        active={activeDay === "sunday"}
+      />
     </div>
   );
 };

@@ -15,14 +15,12 @@ export const RecipeCard = ({
   tags,
   type,
 }: IRecipeCard) => {
-  return (
+  return type === "default" ? (
     <div className={`${styles.recipeCard} ${className || ""}`}>
-      {type === "default" && (
-        <div
-          className={styles.recipeImg}
-          style={{ backgroundImage: `url(/img/${image}.jpg)` }}
-        />
-      )}
+      <div
+        className={styles.recipeImg}
+        style={{ backgroundImage: `url(/img/${image}.jpg)` }}
+      />
       <div className={styles.recipeDetails}>
         <h2 className={styles.recipeTitle}>{title}</h2>
         {tags && (
@@ -36,6 +34,23 @@ export const RecipeCard = ({
             })}
           </div>
         )}
+      </div>
+    </div>
+  ) : (
+    <div className={`${styles.recipeCard} ${className || ""}`}>
+      <div className={styles.recipeDetails}>
+        {tags && (
+          <div className={styles.tagContainer}>
+            {tags?.map((tag, index) => {
+              return (
+                <span className={styles.tag} key={index}>
+                  {tag}
+                </span>
+              );
+            })}
+          </div>
+        )}
+        <h2 className={styles.recipeTitle}>{title}</h2>
       </div>
     </div>
   );
