@@ -4,6 +4,30 @@
   position: relative;
   border: 1px solid var(--dark-light-color);
   border-radius: 8px;
+
+  &:hover {
+    .deleteRecipeButton {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+.deleteRecipeButton {
+  all: unset;
+  opacity: 0;
+  visibility: hidden;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--warning-color);
+  background-color: var(--dark-light-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  transition-delay: 0.1s;
 }
 
 .recipeImg {
@@ -15,6 +39,12 @@
 
 .recipeDetails {
   padding: 1rem;
+
+  .recipeHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 .tagContainer {

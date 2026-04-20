@@ -70,6 +70,27 @@
       height: calc(100% - 3rem);
       overflow-x: hidden;
 
+      .addMealButton {
+        font-size: 1.5rem;
+        color: var(--light-color);
+        width: calc(100% - 1rem);
+        min-height: 40px;
+        background-color: var(--dark-medium-color);
+        border: 1px dashed var(--dark-light-color);
+        border-radius: 8px;
+        transition: 0.3s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+          border-color: var(--light-color);
+          background-color: rgba(var(--dark-light-color-rgb), 0.3);
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--info-color);
+        }
+      }
+
       .recipeCard {
         width: calc(100% - 1rem);
         transition: 0.3s ease-in-out;
@@ -81,12 +102,17 @@
 
         &:hover {
           border-color: var(--light-color);
+          background-color: rgba(var(--dark-light-color-rgb), 0.3);
           box-shadow: 4px 4px 0 var(--light-color);
           transform: translate(-4px, -4px);
 
           h2 {
             color: var(--light-color);
           }
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--info-color);
         }
 
         h2 {
