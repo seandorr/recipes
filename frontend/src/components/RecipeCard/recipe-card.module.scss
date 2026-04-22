@@ -7,36 +7,87 @@
   // cursor: pointer;
 
   &:hover {
-    .deleteRecipeButton {
+    .moreOptionsButton {
       opacity: 1;
       visibility: visible;
     }
   }
 }
 
-.deleteRecipeButton {
+.moreOptionsButton {
   all: unset;
   opacity: 0;
   visibility: hidden;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--warning-color);
-  background-color: var(--dark-light-color);
-  border-radius: 50%;
+  color: var(--light-color);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  position: relative;
   cursor: pointer;
   transition: 0.3s ease-in-out;
-  transition-delay: 0.1s;
 
   &:hover {
-    background-color: var(--warning-color);
-    color: var(--dark-color);
+    background-color: var(--dark-light-color);
   }
 
   &:focus-visible {
     outline: 2px solid var(--info-color);
+  }
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid var(--light-color);
+  }
+}
+
+.moreOptionsContainer {
+  position: relative;
+}
+
+.moreOptionsMenu {
+  position: absolute;
+  top: 33px;
+  right: 0;
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--dark-medium-color);
+  border: 1px solid var(--light-color);
+  border-radius: 8px 0 8px 8px;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(var(--dark-light-color-rgb), 0.8);
+
+  .optionButton {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--light-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+
+    &:hover {
+      background-color: var(--dark-light-color);
+    }
+
+    &.deleteOption {
+      &:hover {
+        background-color: var(--warning-color);
+        color: var(--dark-color);
+      }
+    }
+  }
+
+  .optionIcon {
+    font-size: 16px;
   }
 }
 

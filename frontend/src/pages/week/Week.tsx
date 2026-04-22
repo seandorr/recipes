@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { RecipeCard } from "../../components/RecipeCard";
 import { activeDay } from "../../utils/functions/getDay";
 import styles from "./week.module.scss";
@@ -31,8 +31,11 @@ type IWeekDayColumn = {
     fromIndex: number,
     toDayKey: IDays,
   ) => void;
+  duplicateMeal: (dayKey: IDays, index: number) => void;
   draggedItem: { dayKey: IDays; index: number } | null;
   setDraggedItem: (item: { dayKey: IDays; index: number } | null) => void;
+  toggleMoreOptionsMenu: (dayKey: IDays, index: number) => void;
+  openMenuRecipe: { dayKey: IDays; index: number } | null;
 };
 
 type IDayData = {
@@ -94,9 +97,12 @@ const WeekDayColumn = ({
   addMeal,
   removeMeal,
   reorderMeal,
+  duplicateMeal,
   moveMealToDay,
   draggedItem,
   setDraggedItem,
+  toggleMoreOptionsMenu,
+  openMenuRecipe,
 }: IWeekDayColumn) => {
   return (
     <div
@@ -130,6 +136,9 @@ const WeekDayColumn = ({
           const { title, tags } = recipe;
           const isDragged =
             draggedItem?.dayKey === dayKey && draggedItem?.index === index;
+          const isMenuOpen =
+            openMenuRecipe?.dayKey === dayKey &&
+            openMenuRecipe?.index === index;
 
           return (
             <div
@@ -170,6 +179,11 @@ const WeekDayColumn = ({
                 tags={tags}
                 type="calendar"
                 handleOnDeleteRecipeItem={() => removeMeal(dayKey, index)}
+                handleOnDuplicateRecipeItem={() => duplicateMeal(dayKey, index)}
+                handleOnMoreOptionsButton={() =>
+                  toggleMoreOptionsMenu(dayKey, index)
+                }
+                showMoreOptionsMenu={isMenuOpen}
               />
             </div>
           );
@@ -185,6 +199,28 @@ const Week = () => {
     dayKey: IDays;
     index: number;
   } | null>(null);
+  const [openMenuRecipe, setOpenMenuRecipe] = useState<{
+    dayKey: IDays;
+    index: number;
+  } | null>(null);
+  const weekContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        openMenuRecipe &&
+        weekContainerRef.current &&
+        !weekContainerRef.current.contains(event.target as Node)
+      ) {
+        setOpenMenuRecipe(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openMenuRecipe]);
 
   const addMeal = (dayKey: IDays) => {
     setWeekData((prev) => {
@@ -217,6 +253,7 @@ const Week = () => {
           : day,
       );
     });
+    setOpenMenuRecipe(null);
   };
 
   const reorderMeal = (dayKey: IDays, fromIndex: number, toIndex: number) => {
@@ -229,6 +266,19 @@ const Week = () => {
         return { ...day, meals: newMeals };
       });
     });
+  };
+
+  const duplicateMeal = (dayKey: IDays, index: number) => {
+    setWeekData((prev) => {
+      return prev.map((day) => {
+        if (day.dayKey !== dayKey) return day;
+        const mealToDuplicate = day.meals[index];
+        const newMeals = [...day.meals];
+        newMeals.splice(index + 1, 0, mealToDuplicate);
+        return { ...day, meals: newMeals };
+      });
+    });
+    setOpenMenuRecipe(null);
   };
 
   const moveMealToDay = (
@@ -264,8 +314,23 @@ const Week = () => {
     });
   };
 
+  const toggleMoreOptionsMenu = (dayKey: IDays, index: number) => {
+    setOpenMenuRecipe((prev) => {
+      // If clicking the same recipe, close the menu
+      if (prev?.dayKey === dayKey && prev?.index === index) {
+        return null;
+      }
+      // Otherwise, open the menu for this recipe
+      return { dayKey, index };
+    });
+  };
+
   return (
-    <div className={styles.weekContainer}>
+    <div
+      className={styles.weekContainer}
+      ref={weekContainerRef}
+      onClick={() => setOpenMenuRecipe(null)}
+    >
       {weekData.map((weekDay: IDayData, index) => {
         const { dayKey, title, meals } = weekDay;
         return (
@@ -278,9 +343,12 @@ const Week = () => {
             addMeal={addMeal}
             removeMeal={removeMeal}
             reorderMeal={reorderMeal}
+            duplicateMeal={duplicateMeal}
             moveMealToDay={moveMealToDay}
             draggedItem={draggedItem}
             setDraggedItem={setDraggedItem}
+            toggleMoreOptionsMenu={toggleMoreOptionsMenu}
+            openMenuRecipe={openMenuRecipe}
           />
         );
       })}
