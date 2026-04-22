@@ -57,6 +57,7 @@
   padding: 1rem 0.5rem;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
   background-color: var(--dark-medium-color);
   border: 1px solid var(--light-color);
   border-radius: 8px 0 8px 8px;
@@ -79,9 +80,10 @@
     }
 
     &.deleteOption {
+      color: rgba(var(--warning-color-rgb), 0.8);
       &:hover {
-        background-color: var(--warning-color);
-        color: var(--dark-color);
+        color: var(--warning-color);
+        background-color: rgba(var(--warning-color-rgb), 0.2);
       }
     }
   }
