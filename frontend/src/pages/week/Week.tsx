@@ -216,9 +216,17 @@ const Week = () => {
       }
     };
 
+    const handleEscapePress = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpenMenuRecipe(null);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscapePress);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapePress);
     };
   }, [openMenuRecipe]);
 
