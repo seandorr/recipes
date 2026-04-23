@@ -274,6 +274,7 @@ const Week = () => {
         return { ...day, meals: newMeals };
       });
     });
+    setOpenMenuRecipe(null);
   };
 
   const duplicateMeal = (dayKey: IDays, index: number) => {
@@ -320,6 +321,7 @@ const Week = () => {
 
       return updated;
     });
+    setOpenMenuRecipe(null);
   };
 
   const toggleMoreOptionsMenu = (dayKey: IDays, index: number) => {
