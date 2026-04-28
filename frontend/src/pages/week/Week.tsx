@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
 import { RecipeCard } from "../../components/RecipeCard";
-import { activeDay } from "../../utils/functions/getDay";
-import styles from "./week.module.scss";
-import AddRecipeModal from "../../components/AddRecipeModal/AddRecipeModal";
+import { RecipeDrawer } from "../../components/RecipeDrawer";
 import { useClickOutside } from "../../utils/hooks/useClickOutside";
 import { useEscapePress } from "../../utils/hooks/useEscapePress";
+import { activeDay } from "../../utils/functions/getDay";
+import styles from "./week.module.scss";
 
 type IRecipe = {
   title: string;
@@ -39,7 +39,7 @@ type IWeekDayColumn = {
   setDraggedItem: (item: { dayKey: IDays; index: number } | null) => void;
   toggleMoreOptionsMenu: (dayKey: IDays, index: number) => void;
   openMenuRecipe: { dayKey: IDays; index: number } | null;
-  openAddRecipeModal: boolean;
+  openAddRecipeDrawer: boolean;
 };
 
 type IDayData = {
@@ -107,7 +107,7 @@ const WeekDayColumn = ({
   setDraggedItem,
   toggleMoreOptionsMenu,
   openMenuRecipe,
-  openAddRecipeModal,
+  openAddRecipeDrawer,
 }: IWeekDayColumn) => {
   return (
     <div
@@ -134,7 +134,7 @@ const WeekDayColumn = ({
         <button
           className={styles.addMealButton}
           onClick={() => addMeal()}
-          disabled={openAddRecipeModal}
+          disabled={openAddRecipeDrawer}
         >
           +
         </button>
@@ -209,9 +209,9 @@ const Week = () => {
     dayKey: IDays;
     index: number;
   } | null>(null);
-  const [openAddRecipeModal, setOpenAddRecipeModal] = useState(false);
+  const [openAddRecipeDrawer, setOpenAddRecipeDrawer] = useState(false);
   const weekContainerRef = useRef<HTMLDivElement>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(
     weekContainerRef,
@@ -220,9 +220,9 @@ const Week = () => {
   );
 
   useClickOutside(
-    modalRef,
-    () => setOpenAddRecipeModal(false),
-    openAddRecipeModal,
+    drawerRef,
+    () => setOpenAddRecipeDrawer(false),
+    openAddRecipeDrawer,
   );
 
   useEscapePress(
@@ -233,12 +233,12 @@ const Week = () => {
 
   useEscapePress(
     weekContainerRef,
-    () => setOpenAddRecipeModal(false),
-    !!openAddRecipeModal,
+    () => setOpenAddRecipeDrawer(false),
+    !!openAddRecipeDrawer,
   );
 
   const addMeal = () => {
-    setOpenAddRecipeModal(true);
+    setOpenAddRecipeDrawer(true);
     // setWeekData((prev) => {
     //   return prev.map((day) =>
     //     day.dayKey === dayKey
@@ -259,7 +259,7 @@ const Week = () => {
   };
 
   const onClose = () => {
-    setOpenAddRecipeModal(false);
+    setOpenAddRecipeDrawer(false);
   };
 
   const removeMeal = (dayKey: IDays, index: number) => {
@@ -353,8 +353,8 @@ const Week = () => {
       ref={weekContainerRef}
       onClick={() => setOpenMenuRecipe(null)}
     >
-      {openAddRecipeModal && (
-        <AddRecipeModal ref={modalRef} onClose={onClose} />
+      {openAddRecipeDrawer && (
+        <RecipeDrawer ref={drawerRef} onClose={onClose} />
       )}
       {weekData.map((weekDay: IDayData, index) => {
         const { dayKey, title, meals } = weekDay;
@@ -374,7 +374,7 @@ const Week = () => {
             setDraggedItem={setDraggedItem}
             toggleMoreOptionsMenu={toggleMoreOptionsMenu}
             openMenuRecipe={openMenuRecipe}
-            openAddRecipeModal={openAddRecipeModal}
+            openAddRecipeDrawer={openAddRecipeDrawer}
           />
         );
       })}

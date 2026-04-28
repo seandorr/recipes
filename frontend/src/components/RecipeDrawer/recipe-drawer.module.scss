@@ -1,4 +1,4 @@
-.modalContainer {
+.drawerContainer {
   position: fixed;
   top: 0;
   right: 0;
@@ -9,10 +9,10 @@
   border-radius: 8px 0 0 8px;
   z-index: 3;
 
-  .modalContent {
+  .drawerContent {
     padding: 2rem;
 
-    .modalHeader {
+    .drawerHeader {
       display: flex;
       align-items: center;
       justify-content: space-between;
