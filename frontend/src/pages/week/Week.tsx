@@ -1,7 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { RecipeCard } from "../../components/RecipeCard";
 import { activeDay } from "../../utils/functions/getDay";
 import styles from "./week.module.scss";
+import AddRecipeModal from "../../components/AddRecipeModal/AddRecipeModal";
+import { useClickOutside } from "../../utils/hooks/useClickOutside";
+import { useEscapePress } from "../../utils/hooks/useEscapePress";
 
 type IRecipe = {
   title: string;
@@ -23,7 +26,7 @@ type IWeekDayColumn = {
   title: string;
   meals: IRecipe[];
   active: boolean;
-  addMeal: (dayKey: IDays) => void;
+  addMeal: () => void;
   removeMeal: (dayKey: IDays, index: number) => void;
   reorderMeal: (dayKey: IDays, fromIndex: number, toIndex: number) => void;
   moveMealToDay: (
@@ -36,6 +39,7 @@ type IWeekDayColumn = {
   setDraggedItem: (item: { dayKey: IDays; index: number } | null) => void;
   toggleMoreOptionsMenu: (dayKey: IDays, index: number) => void;
   openMenuRecipe: { dayKey: IDays; index: number } | null;
+  openAddRecipeModal: boolean;
 };
 
 type IDayData = {
@@ -103,6 +107,7 @@ const WeekDayColumn = ({
   setDraggedItem,
   toggleMoreOptionsMenu,
   openMenuRecipe,
+  openAddRecipeModal,
 }: IWeekDayColumn) => {
   return (
     <div
@@ -128,7 +133,8 @@ const WeekDayColumn = ({
       >
         <button
           className={styles.addMealButton}
-          onClick={() => addMeal(dayKey)}
+          onClick={() => addMeal()}
+          disabled={openAddRecipeModal}
         >
           +
         </button>
@@ -203,51 +209,57 @@ const Week = () => {
     dayKey: IDays;
     index: number;
   } | null>(null);
+  const [openAddRecipeModal, setOpenAddRecipeModal] = useState(false);
   const weekContainerRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        openMenuRecipe &&
-        weekContainerRef.current &&
-        !weekContainerRef.current.contains(event.target as Node)
-      ) {
-        setOpenMenuRecipe(null);
-      }
-    };
+  useClickOutside(
+    weekContainerRef,
+    () => setOpenMenuRecipe(null),
+    !!openMenuRecipe,
+  );
 
-    const handleEscapePress = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpenMenuRecipe(null);
-      }
-    };
+  useClickOutside(
+    modalRef,
+    () => setOpenAddRecipeModal(false),
+    openAddRecipeModal,
+  );
 
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscapePress);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscapePress);
-    };
-  }, [openMenuRecipe]);
+  useEscapePress(
+    weekContainerRef,
+    () => setOpenMenuRecipe(null),
+    !!openMenuRecipe,
+  );
 
-  const addMeal = (dayKey: IDays) => {
-    setWeekData((prev) => {
-      return prev.map((day) =>
-        day.dayKey === dayKey
-          ? {
-              ...day,
-              meals: [
-                ...day.meals,
-                {
-                  title: "Nueva receta",
-                  image: "breakfast_bagel",
-                  tags: ["Desayuno"],
-                },
-              ],
-            }
-          : day,
-      );
-    });
+  useEscapePress(
+    weekContainerRef,
+    () => setOpenAddRecipeModal(false),
+    !!openAddRecipeModal,
+  );
+
+  const addMeal = () => {
+    setOpenAddRecipeModal(true);
+    // setWeekData((prev) => {
+    //   return prev.map((day) =>
+    //     day.dayKey === dayKey
+    //       ? {
+    //           ...day,
+    //           meals: [
+    //             ...day.meals,
+    //             {
+    //               title: "Nueva receta",
+    //               image: "breakfast_bagel",
+    //               tags: ["Desayuno"],
+    //             },
+    //           ],
+    //         }
+    //       : day,
+    //   );
+    // });
+  };
+
+  const onClose = () => {
+    setOpenAddRecipeModal(false);
   };
 
   const removeMeal = (dayKey: IDays, index: number) => {
@@ -341,6 +353,9 @@ const Week = () => {
       ref={weekContainerRef}
       onClick={() => setOpenMenuRecipe(null)}
     >
+      {openAddRecipeModal && (
+        <AddRecipeModal ref={modalRef} onClose={onClose} />
+      )}
       {weekData.map((weekDay: IDayData, index) => {
         const { dayKey, title, meals } = weekDay;
         return (
@@ -359,6 +374,7 @@ const Week = () => {
             setDraggedItem={setDraggedItem}
             toggleMoreOptionsMenu={toggleMoreOptionsMenu}
             openMenuRecipe={openMenuRecipe}
+            openAddRecipeModal={openAddRecipeModal}
           />
         );
       })}

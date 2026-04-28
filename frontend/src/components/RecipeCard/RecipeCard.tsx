@@ -6,10 +6,10 @@ type IRecipeCard = {
   image?: string;
   tags?: string[];
   type: "calendar" | "default";
-  handleOnDeleteRecipeItem: () => void;
+  handleOnDeleteRecipeItem?: () => void;
   handleOnDuplicateRecipeItem?: () => void;
-  handleOnMoreOptionsButton: () => void;
-  showMoreOptionsMenu: boolean;
+  handleOnMoreOptionsButton?: () => void;
+  showMoreOptionsMenu?: boolean;
 };
 
 export const RecipeCard = ({
@@ -84,7 +84,7 @@ export const RecipeCard = ({
               className={`${styles.moreOptionsButton} ${showMoreOptionsMenu ? styles.active : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
-                handleOnMoreOptionsButton();
+                if (handleOnMoreOptionsButton) handleOnMoreOptionsButton();
               }}
             >
               <span className="material-symbols-outlined">

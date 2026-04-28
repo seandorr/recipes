@@ -89,6 +89,16 @@
         &:focus-visible {
           outline: 2px solid var(--info-color);
         }
+
+        &[disabled] {
+          opacity: 0.5;
+          cursor: not-allowed;
+
+          &:hover {
+            border-color: var(--dark-light-color);
+            background-color: var(--dark-medium-color);
+          }
+        }
       }
 
       .draggableRecipeCard {
