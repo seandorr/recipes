@@ -110,15 +110,3 @@
     gap: 0.5rem;
   }
 }
-
-.tagContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-
-  .tag {
-    background-color: var(--dark-light-color);
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-}

@@ -1,16 +1,6 @@
+import type { RecipeCardProps } from "../../utils/types";
+import { TagGroup } from "../Tag";
 import styles from "./recipe-card.module.scss";
-
-type IRecipeCard = {
-  className?: string;
-  title: string;
-  image?: string;
-  tags?: string[];
-  type: "calendar" | "default";
-  handleOnDeleteRecipeItem?: () => void;
-  handleOnDuplicateRecipeItem?: () => void;
-  handleOnMoreOptionsButton?: () => void;
-  showMoreOptionsMenu?: boolean;
-};
 
 export const RecipeCard = ({
   className,
@@ -22,7 +12,8 @@ export const RecipeCard = ({
   handleOnDuplicateRecipeItem,
   handleOnMoreOptionsButton,
   showMoreOptionsMenu,
-}: IRecipeCard) => {
+  handleOnTitleClick,
+}: RecipeCardProps) => {
   const menuOptions = [
     {
       id: "edit",
@@ -38,8 +29,8 @@ export const RecipeCard = ({
     },
     {
       id: "delete",
-      label: "Borrar",
-      icon: "delete",
+      label: "Eliminar",
+      icon: "content_cut",
       action: handleOnDeleteRecipeItem,
     },
   ];
@@ -51,34 +42,14 @@ export const RecipeCard = ({
       />
       <div className={styles.recipeDetails}>
         <h2 className={styles.recipeTitle}>{title}</h2>
-        {tags && (
-          <div className={styles.tagContainer}>
-            {tags?.map((tag, index) => {
-              return (
-                <span className={styles.tag} key={index}>
-                  {tag}
-                </span>
-              );
-            })}
-          </div>
-        )}
+        {tags && <TagGroup tags={tags} />}
       </div>
     </div>
   ) : (
     <div className={`${styles.recipeCard} ${className || ""}`} tabIndex={0}>
       <div className={styles.recipeDetails}>
         <div className={styles.recipeHeader}>
-          {tags && (
-            <div className={styles.tagContainer}>
-              {tags?.map((tag, index) => {
-                return (
-                  <span className={styles.tag} key={index}>
-                    {tag}
-                  </span>
-                );
-              })}
-            </div>
-          )}
+          {tags && <TagGroup tags={tags} />}
           <div className={styles.moreOptionsContainer}>
             <button
               className={`${styles.moreOptionsButton} ${showMoreOptionsMenu ? styles.active : ""}`}
@@ -118,7 +89,9 @@ export const RecipeCard = ({
             )}
           </div>
         </div>
-        <h2 className={styles.recipeTitle}>{title}</h2>
+        <h2 className={styles.recipeTitle} onClick={handleOnTitleClick}>
+          {title}
+        </h2>
       </div>
     </div>
   );

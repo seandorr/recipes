@@ -116,8 +116,8 @@
         &:hover {
           border-color: var(--light-color);
           background-color: rgba(var(--dark-light-color-rgb), 0.3);
-          box-shadow: 4px 4px 0 var(--light-color);
-          transform: translate(-4px, -4px);
+          box-shadow: 0 4px 0 var(--light-color);
+          // transform: translate(-4px, -4px);
         }
 
         &:focus-visible {

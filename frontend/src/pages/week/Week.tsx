@@ -5,93 +5,37 @@ import { useClickOutside } from "../../utils/hooks/useClickOutside";
 import { useEscapePress } from "../../utils/hooks/useEscapePress";
 import { activeDay } from "../../utils/functions/getDay";
 import styles from "./week.module.scss";
+import { TagGroup } from "../../components/Tag";
+import { recipes, initialWeekDays } from "../../utils/constants/recipes";
+import type { DayDataProps, DaysProps } from "../../utils/types";
 
-type IRecipe = {
+type IWeekMeal = {
+  recipeId: string;
   title: string;
-  image: string;
-  tags?: string[];
+  slot?: string;
 };
-
-type IDays =
-  | "monday"
-  | "tuesday"
-  | "wednesday"
-  | "thursday"
-  | "friday"
-  | "saturday"
-  | "sunday";
 
 type IWeekDayColumn = {
-  dayKey: IDays;
+  dayKey: DaysProps;
   title: string;
-  meals: IRecipe[];
+  meals: IWeekMeal[];
   active: boolean;
-  addMeal: () => void;
-  removeMeal: (dayKey: IDays, index: number) => void;
-  reorderMeal: (dayKey: IDays, fromIndex: number, toIndex: number) => void;
+  addMeal: ({ dayKey }: { dayKey: DaysProps }) => void;
+  removeMeal: (dayKey: DaysProps, index: number) => void;
+  reorderMeal: (dayKey: DaysProps, fromIndex: number, toIndex: number) => void;
   moveMealToDay: (
-    fromDayKey: IDays,
+    fromDayKey: DaysProps,
     fromIndex: number,
-    toDayKey: IDays,
+    toDayKey: DaysProps,
   ) => void;
-  duplicateMeal: (dayKey: IDays, index: number) => void;
-  draggedItem: { dayKey: IDays; index: number } | null;
-  setDraggedItem: (item: { dayKey: IDays; index: number } | null) => void;
-  toggleMoreOptionsMenu: (dayKey: IDays, index: number) => void;
-  openMenuRecipe: { dayKey: IDays; index: number } | null;
+  duplicateMeal: (dayKey: DaysProps, index: number) => void;
+  draggedItem: { dayKey: DaysProps; index: number } | null;
+  setDraggedItem: (item: { dayKey: DaysProps; index: number } | null) => void;
+  toggleMoreOptionsMenu: (dayKey: DaysProps, index: number) => void;
+  openMenuRecipe: { dayKey: DaysProps; index: number } | null;
   openAddRecipeDrawer: boolean;
+  viewRecipe: (recipeId: string) => void;
 };
-
-type IDayData = {
-  dayKey: IDays;
-  title: string;
-  meals: IRecipe[];
-};
-
-const initialWeekDays: IDayData[] = [
-  {
-    dayKey: "monday",
-    title: "Lunes",
-    meals: [
-      {
-        title: "Huevos con tostada y fruta",
-        image: "breakfast_bagel",
-        tags: ["Desayuno"],
-      },
-      {
-        title: "Yogur + frutos secos",
-        image: "broccoli_beef",
-        tags: ["Snack"],
-      },
-      {
-        title: "Bowl de pollo con arroz y verduras",
-        image: "breakfast_bagel",
-        tags: ["Almuerzo"],
-      },
-      {
-        title: "Hummus + zanahoria",
-        image: "broccoli_beef",
-        tags: ["Merienda"],
-      },
-      {
-        title: "Ternera con ensalada",
-        image: "breakfast_bagel",
-        tags: ["Cena"],
-      },
-      {
-        title: "Requesón",
-        image: "broccoli_beef",
-        tags: ["Snack noche"],
-      },
-    ],
-  },
-  { dayKey: "tuesday", title: "Martes", meals: [] },
-  { dayKey: "wednesday", title: "Miércoles", meals: [] },
-  { dayKey: "thursday", title: "Jueves", meals: [] },
-  { dayKey: "friday", title: "Viernes", meals: [] },
-  { dayKey: "saturday", title: "Sábado", meals: [] },
-  { dayKey: "sunday", title: "Domingo", meals: [] },
-];
 
 const WeekDayColumn = ({
   dayKey,
@@ -108,6 +52,7 @@ const WeekDayColumn = ({
   toggleMoreOptionsMenu,
   openMenuRecipe,
   openAddRecipeDrawer,
+  viewRecipe,
 }: IWeekDayColumn) => {
   return (
     <div
@@ -133,13 +78,15 @@ const WeekDayColumn = ({
       >
         <button
           className={styles.addMealButton}
-          onClick={() => addMeal()}
+          onClick={() => addMeal({ dayKey })}
           disabled={openAddRecipeDrawer}
         >
           +
         </button>
-        {meals.map((recipe, index) => {
-          const { title, tags } = recipe;
+        {meals.map((meal, index) => {
+          const recipe = recipes.find((item) => item.id === meal.recipeId);
+          const title = meal.title ?? recipe?.title ?? "Receta";
+          const tags = recipe?.tags ?? [];
           const isDragged =
             draggedItem?.dayKey === dayKey && draggedItem?.index === index;
           const isMenuOpen =
@@ -149,7 +96,7 @@ const WeekDayColumn = ({
           return (
             <div
               className={styles.draggableRecipeCard}
-              key={index}
+              key={`${meal.recipeId}-${index}`}
               draggable
               onDragStart={() => setDraggedItem({ dayKey, index })}
               onDragOver={(e) => e.preventDefault()}
@@ -190,6 +137,7 @@ const WeekDayColumn = ({
                   toggleMoreOptionsMenu(dayKey, index)
                 }
                 showMoreOptionsMenu={isMenuOpen}
+                handleOnTitleClick={() => viewRecipe(meal.recipeId)}
               />
             </div>
           );
@@ -200,16 +148,17 @@ const WeekDayColumn = ({
 };
 
 const Week = () => {
-  const [weekData, setWeekData] = useState<IDayData[]>(initialWeekDays);
+  const [weekData, setWeekData] = useState<DayDataProps[]>(initialWeekDays);
   const [draggedItem, setDraggedItem] = useState<{
-    dayKey: IDays;
+    dayKey: DaysProps;
     index: number;
   } | null>(null);
   const [openMenuRecipe, setOpenMenuRecipe] = useState<{
-    dayKey: IDays;
+    dayKey: DaysProps;
     index: number;
   } | null>(null);
   const [openAddRecipeDrawer, setOpenAddRecipeDrawer] = useState(false);
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
   const weekContainerRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -237,32 +186,41 @@ const Week = () => {
     !!openAddRecipeDrawer,
   );
 
-  const addMeal = () => {
+  const viewRecipe = (recipeId: string) => {
+    setSelectedRecipeId(recipeId);
     setOpenAddRecipeDrawer(true);
-    // setWeekData((prev) => {
-    //   return prev.map((day) =>
-    //     day.dayKey === dayKey
-    //       ? {
-    //           ...day,
-    //           meals: [
-    //             ...day.meals,
-    //             {
-    //               title: "Nueva receta",
-    //               image: "breakfast_bagel",
-    //               tags: ["Desayuno"],
-    //             },
-    //           ],
-    //         }
-    //       : day,
-    //   );
-    // });
+  };
+
+  const selectedRecipe = selectedRecipeId
+    ? (recipes.find((recipe) => recipe.id === selectedRecipeId) ?? null)
+    : null;
+
+  const addMeal = ({ dayKey }: { dayKey: DaysProps }) => {
+    const defaultRecipeId = recipes[0]?.id ?? "1";
+    const newMeal: IWeekMeal = {
+      recipeId: defaultRecipeId,
+      title: "Nueva receta",
+      slot: "Desayuno",
+    };
+
+    setWeekData((prev) => {
+      return prev.map((day) =>
+        day.dayKey === dayKey
+          ? {
+              ...day,
+              meals: [...day.meals, newMeal],
+            }
+          : day,
+      );
+    });
   };
 
   const onClose = () => {
     setOpenAddRecipeDrawer(false);
+    setSelectedRecipeId(null);
   };
 
-  const removeMeal = (dayKey: IDays, index: number) => {
+  const removeMeal = (dayKey: DaysProps, index: number) => {
     setWeekData((prev) => {
       return prev.map((day) =>
         day.dayKey === dayKey
@@ -276,7 +234,11 @@ const Week = () => {
     setOpenMenuRecipe(null);
   };
 
-  const reorderMeal = (dayKey: IDays, fromIndex: number, toIndex: number) => {
+  const reorderMeal = (
+    dayKey: DaysProps,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
     setWeekData((prev) => {
       return prev.map((day) => {
         if (day.dayKey !== dayKey) return day;
@@ -289,13 +251,13 @@ const Week = () => {
     setOpenMenuRecipe(null);
   };
 
-  const duplicateMeal = (dayKey: IDays, index: number) => {
+  const duplicateMeal = (dayKey: DaysProps, index: number) => {
     setWeekData((prev) => {
       return prev.map((day) => {
         if (day.dayKey !== dayKey) return day;
         const mealToDuplicate = day.meals[index];
         const newMeals = [...day.meals];
-        newMeals.splice(index + 1, 0, mealToDuplicate);
+        newMeals.splice(index + 1, 0, { ...mealToDuplicate });
         return { ...day, meals: newMeals };
       });
     });
@@ -303,40 +265,40 @@ const Week = () => {
   };
 
   const moveMealToDay = (
-    fromDayKey: IDays,
+    fromDayKey: DaysProps,
     fromIndex: number,
-    toDayKey: IDays,
+    toDayKey: DaysProps,
   ) => {
     setWeekData((prev) => {
-      let mealToMove: IRecipe | undefined;
+      const sourceDay = prev.find((day) => day.dayKey === fromDayKey);
+      const mealToMove = sourceDay?.meals[fromIndex];
 
-      // Find and remove meal from source day
-      const updated = prev.map((day) => {
+      if (!mealToMove) {
+        return prev;
+      }
+
+      return prev.map((day) => {
         if (day.dayKey === fromDayKey) {
-          mealToMove = day.meals[fromIndex];
           return {
             ...day,
             meals: day.meals.filter((_, index) => index !== fromIndex),
           };
         }
+
+        if (day.dayKey === toDayKey) {
+          return {
+            ...day,
+            meals: [...day.meals, mealToMove],
+          };
+        }
+
         return day;
       });
-
-      // Add meal to target day
-      if (mealToMove !== undefined) {
-        return updated.map((day) =>
-          day.dayKey === toDayKey
-            ? { ...day, meals: [...day.meals, mealToMove as IRecipe] }
-            : day,
-        );
-      }
-
-      return updated;
     });
     setOpenMenuRecipe(null);
   };
 
-  const toggleMoreOptionsMenu = (dayKey: IDays, index: number) => {
+  const toggleMoreOptionsMenu = (dayKey: DaysProps, index: number) => {
     setOpenMenuRecipe((prev) => {
       // If clicking the same recipe, close the menu
       if (prev?.dayKey === dayKey && prev?.index === index) {
@@ -354,9 +316,43 @@ const Week = () => {
       onClick={() => setOpenMenuRecipe(null)}
     >
       {openAddRecipeDrawer && (
-        <RecipeDrawer ref={drawerRef} onClose={onClose} />
+        <RecipeDrawer
+          ref={drawerRef}
+          onClose={onClose}
+          title={selectedRecipe ? selectedRecipe.title : "Nueva receta"}
+          content={
+            selectedRecipe ? (
+              selectedRecipe?.tags && (
+                <>
+                  <TagGroup tags={selectedRecipe.tags} />
+                  <img
+                    src={
+                      selectedRecipe
+                        ? `/img/${selectedRecipe.image}.jpg`
+                        : "/img/breakfast_bagel.jpg"
+                    }
+                    alt={selectedRecipe?.title}
+                    style={{
+                      width: "100%",
+                      maxWidth: "300px",
+                      borderRadius: "8px",
+                      marginTop: "1rem",
+                    }}
+                  />
+                  <ul>
+                    {selectedRecipe.ingredients?.map((ingredient, index) => (
+                      <li key={index}>{ingredient}</li>
+                    ))}
+                  </ul>
+                </>
+              )
+            ) : (
+              <p>Empty</p>
+            )
+          }
+        />
       )}
-      {weekData.map((weekDay: IDayData, index) => {
+      {weekData.map((weekDay: DayDataProps, index) => {
         const { dayKey, title, meals } = weekDay;
         return (
           <WeekDayColumn
@@ -375,6 +371,7 @@ const Week = () => {
             toggleMoreOptionsMenu={toggleMoreOptionsMenu}
             openMenuRecipe={openMenuRecipe}
             openAddRecipeDrawer={openAddRecipeDrawer}
+            viewRecipe={viewRecipe}
           />
         );
       })}
