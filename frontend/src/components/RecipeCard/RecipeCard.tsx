@@ -1,11 +1,12 @@
 import type { RecipeCardProps } from "../../utils/types";
-import { TagGroup } from "../Tag";
+import { Tag, TagGroup } from "../Tag";
 import styles from "./recipe-card.module.scss";
 
 export const RecipeCard = ({
   className,
   title,
   image,
+  mealType,
   tags,
   type,
   handleOnDeleteRecipeItem,
@@ -36,12 +37,15 @@ export const RecipeCard = ({
   ];
   return type === "default" ? (
     <div className={`${styles.recipeCard} ${className || ""}`} tabIndex={0}>
-      <div
-        className={styles.recipeImg}
-        style={{ backgroundImage: `url(/img/${image}.jpg)` }}
-      />
+      {image && (
+        <div
+          className={styles.recipeImg}
+          style={{ backgroundImage: `url(/img/${image}.jpg)` }}
+        />
+      )}
       <div className={styles.recipeDetails}>
         <h2 className={styles.recipeTitle}>{title}</h2>
+        <Tag label={mealType} />
         {tags && <TagGroup tags={tags} />}
       </div>
     </div>
@@ -49,6 +53,7 @@ export const RecipeCard = ({
     <div className={`${styles.recipeCard} ${className || ""}`} tabIndex={0}>
       <div className={styles.recipeDetails}>
         <div className={styles.recipeHeader}>
+          <Tag label={mealType} />
           {tags && <TagGroup tags={tags} />}
           <div className={styles.moreOptionsContainer}>
             <button

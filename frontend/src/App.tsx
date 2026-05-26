@@ -14,7 +14,7 @@ const App = () => {
       <main>
         <div className="recipe-grid">
           {recipes.map((recipe, index) => {
-            const { title, image, tags } = recipe;
+            const { title, image, tags, mealType } = recipe;
 
             return (
               <RecipeCard
@@ -22,6 +22,7 @@ const App = () => {
                 title={title}
                 image={image}
                 tags={tags}
+                mealType={mealType}
                 type="default"
               />
             );

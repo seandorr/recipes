@@ -5,37 +5,14 @@ import { useClickOutside } from "../../utils/hooks/useClickOutside";
 import { useEscapePress } from "../../utils/hooks/useEscapePress";
 import { activeDay } from "../../utils/functions/getDay";
 import styles from "./week.module.scss";
-import { TagGroup } from "../../components/Tag";
+import { Tag } from "../../components/Tag";
 import { recipes, initialWeekDays } from "../../utils/constants/recipes";
-import type { DayDataProps, DaysProps } from "../../utils/types";
-
-type IWeekMeal = {
-  recipeId: string;
-  title: string;
-  slot?: string;
-};
-
-type IWeekDayColumn = {
-  dayKey: DaysProps;
-  title: string;
-  meals: IWeekMeal[];
-  active: boolean;
-  addMeal: ({ dayKey }: { dayKey: DaysProps }) => void;
-  removeMeal: (dayKey: DaysProps, index: number) => void;
-  reorderMeal: (dayKey: DaysProps, fromIndex: number, toIndex: number) => void;
-  moveMealToDay: (
-    fromDayKey: DaysProps,
-    fromIndex: number,
-    toDayKey: DaysProps,
-  ) => void;
-  duplicateMeal: (dayKey: DaysProps, index: number) => void;
-  draggedItem: { dayKey: DaysProps; index: number } | null;
-  setDraggedItem: (item: { dayKey: DaysProps; index: number } | null) => void;
-  toggleMoreOptionsMenu: (dayKey: DaysProps, index: number) => void;
-  openMenuRecipe: { dayKey: DaysProps; index: number } | null;
-  openAddRecipeDrawer: boolean;
-  viewRecipe: (recipeId: string) => void;
-};
+import type {
+  DayDataProps,
+  DaysProps,
+  WeekDayColumnProps,
+  WeekMealProps,
+} from "../../utils/types";
 
 const WeekDayColumn = ({
   dayKey,
@@ -53,7 +30,7 @@ const WeekDayColumn = ({
   openMenuRecipe,
   openAddRecipeDrawer,
   viewRecipe,
-}: IWeekDayColumn) => {
+}: WeekDayColumnProps) => {
   return (
     <div
       className={`${styles.weekDayContainer} ${active ? styles.active : ""}`}
@@ -86,6 +63,7 @@ const WeekDayColumn = ({
         {meals.map((meal, index) => {
           const recipe = recipes.find((item) => item.id === meal.recipeId);
           const title = meal.title ?? recipe?.title ?? "Receta";
+          const mealType = recipe?.mealType ?? "Desayuno";
           const tags = recipe?.tags ?? [];
           const isDragged =
             draggedItem?.dayKey === dayKey && draggedItem?.index === index;
@@ -131,6 +109,7 @@ const WeekDayColumn = ({
                 title={title}
                 tags={tags}
                 type="calendar"
+                mealType={mealType}
                 handleOnDeleteRecipeItem={() => removeMeal(dayKey, index)}
                 handleOnDuplicateRecipeItem={() => duplicateMeal(dayKey, index)}
                 handleOnMoreOptionsButton={() =>
@@ -197,10 +176,10 @@ const Week = () => {
 
   const addMeal = ({ dayKey }: { dayKey: DaysProps }) => {
     const defaultRecipeId = recipes[0]?.id ?? "1";
-    const newMeal: IWeekMeal = {
+    const newMeal: WeekMealProps = {
       recipeId: defaultRecipeId,
       title: "Nueva receta",
-      slot: "Desayuno",
+      mealType: "Desayuno",
     };
 
     setWeekData((prev) => {
@@ -315,40 +294,37 @@ const Week = () => {
       ref={weekContainerRef}
       onClick={() => setOpenMenuRecipe(null)}
     >
-      {openAddRecipeDrawer && (
+      {openAddRecipeDrawer && selectedRecipe && (
         <RecipeDrawer
           ref={drawerRef}
           onClose={onClose}
           title={selectedRecipe ? selectedRecipe.title : "Nueva receta"}
           content={
-            selectedRecipe ? (
-              selectedRecipe?.tags && (
-                <>
-                  <TagGroup tags={selectedRecipe.tags} />
-                  <img
-                    src={
-                      selectedRecipe
-                        ? `/img/${selectedRecipe.image}.jpg`
-                        : "/img/breakfast_bagel.jpg"
-                    }
-                    alt={selectedRecipe?.title}
-                    style={{
-                      width: "100%",
-                      maxWidth: "300px",
-                      borderRadius: "8px",
-                      marginTop: "1rem",
-                    }}
-                  />
-                  <ul>
-                    {selectedRecipe.ingredients?.map((ingredient, index) => (
-                      <li key={index}>{ingredient}</li>
-                    ))}
-                  </ul>
-                </>
-              )
-            ) : (
-              <p>Empty</p>
-            )
+            <>
+              <Tag label={selectedRecipe?.mealType} />
+              {selectedRecipe.image && (
+                <img
+                  src={
+                    selectedRecipe?.image
+                      ? `/img/${selectedRecipe.image}.jpg`
+                      : "/img/breakfast_bagel.jpg"
+                  }
+                  alt={selectedRecipe?.title}
+                  style={{
+                    width: "100%",
+                    maxWidth: "300px",
+                    borderRadius: "8px",
+                    marginTop: "1rem",
+                  }}
+                />
+              )}
+
+              <ul>
+                {selectedRecipe.ingredients?.map((ingredient, index) => (
+                  <li key={index}>{ingredient}</li>
+                ))}
+              </ul>
+            </>
           }
         />
       )}

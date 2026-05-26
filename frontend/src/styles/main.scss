@@ -51,7 +51,7 @@ header {
 
 .recipe-grid {
   margin: 2rem;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
 }
