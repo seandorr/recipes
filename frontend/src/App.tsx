@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { RecipeCard } from "./components/RecipeCard";
+import { useNavigate } from "react-router";
 // import { recipes } from "./utils/constants/recipes";
 
 const App = () => {
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -47,9 +50,12 @@ const App = () => {
         ) : (
           !isRateLimited && recipes.length === 0 && <p>No recipes found.</p>
         )}
-        {recipes.length > 0 && (
-          <div className="recipe-grid">
-            {recipes.map((recipe, index) => {
+        <div className="recipe-grid">
+          <button className="addMealButton" onClick={() => navigate("/create")}>
+            +
+          </button>
+          {recipes.length > 0 &&
+            recipes.map((recipe, index) => {
               const { title, image, tags, mealType } = recipe;
 
               return (
@@ -63,8 +69,7 @@ const App = () => {
                 />
               );
             })}
-          </div>
-        )}
+        </div>
       </main>
     </div>
   );
