@@ -65,15 +65,20 @@ export type WeekDayColumnProps = {
   addMeal: ({ dayKey }: { dayKey: DaysProps }) => void;
   removeMeal: (dayKey: DaysProps, index: number) => void;
   reorderMeal: (dayKey: DaysProps, fromIndex: number, toIndex: number) => void;
+  duplicateMeal: (dayKey: DaysProps, index: number) => void;
+  draggedItem: { dayKey: DaysProps; index: number } | null;
+  setDraggedItem: (item: { dayKey: DaysProps; index: number } | null) => void;
+  placeholderLocation: { dayKey: DaysProps; index: number } | null;
+  setPlaceholderLocation: (
+    location: { dayKey: DaysProps; index: number } | null,
+  ) => void;
+  toggleMoreOptionsMenu: (dayKey: DaysProps, index: number) => void;
   moveMealToDay: (
     fromDayKey: DaysProps,
     fromIndex: number,
     toDayKey: DaysProps,
+    toIndex?: number,
   ) => void;
-  duplicateMeal: (dayKey: DaysProps, index: number) => void;
-  draggedItem: { dayKey: DaysProps; index: number } | null;
-  setDraggedItem: (item: { dayKey: DaysProps; index: number } | null) => void;
-  toggleMoreOptionsMenu: (dayKey: DaysProps, index: number) => void;
   openMenuRecipe: { dayKey: DaysProps; index: number } | null;
   openAddRecipeDrawer: boolean;
   viewRecipe: (recipeId: string) => void;

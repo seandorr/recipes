@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { Fragment, useState, useRef, type DragEvent } from "react";
 import { RecipeCard } from "../../components/RecipeCard";
 import { RecipeDrawer } from "../../components/RecipeDrawer";
 import { useClickOutside } from "../../utils/hooks/useClickOutside";
@@ -26,11 +26,40 @@ const WeekDayColumn = ({
   moveMealToDay,
   draggedItem,
   setDraggedItem,
+  placeholderLocation,
+  setPlaceholderLocation,
   toggleMoreOptionsMenu,
   openMenuRecipe,
   openAddRecipeDrawer,
   viewRecipe,
 }: WeekDayColumnProps) => {
+  const dragImageRef = useRef<HTMLElement | null>(null);
+  const placeholderIndex =
+    placeholderLocation?.dayKey === dayKey ? placeholderLocation.index : null;
+
+  const cleanupDragGhost = () => {
+    if (dragImageRef.current) {
+      document.body.removeChild(dragImageRef.current);
+      dragImageRef.current = null;
+    }
+  };
+
+  const getDropIndex = (e: DragEvent<HTMLDivElement>, index: number) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const shouldPlaceAfter = e.clientY > rect.top + rect.height / 2;
+    const nextIndex = shouldPlaceAfter ? index + 1 : index;
+    return Math.min(nextIndex, meals.length);
+  };
+
+  const setPlaceholderIfChanged = (dayKey: DaysProps, index: number) => {
+    if (
+      placeholderLocation?.dayKey !== dayKey ||
+      placeholderLocation?.index !== index
+    ) {
+      setPlaceholderLocation({ dayKey, index });
+    }
+  };
+
   return (
     <div
       className={`${styles.weekDayContainer} ${active ? styles.active : ""}`}
@@ -45,12 +74,40 @@ const WeekDayColumn = ({
       </div>
       <div
         className={styles.recipesContainer}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={() => {
-          if (draggedItem && draggedItem.dayKey !== dayKey) {
-            moveMealToDay(draggedItem.dayKey, draggedItem.index, dayKey);
-            setDraggedItem(null);
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (draggedItem && e.currentTarget === e.target) {
+            setPlaceholderLocation({ dayKey, index: meals.length });
           }
+        }}
+        onDrop={() => {
+          if (!draggedItem) {
+            setPlaceholderLocation(null);
+            return;
+          }
+
+          const targetIndex =
+            placeholderLocation?.dayKey === dayKey
+              ? placeholderLocation.index
+              : meals.length;
+          if (draggedItem.dayKey === dayKey) {
+            if (draggedItem.index !== targetIndex) {
+              reorderMeal(dayKey, draggedItem.index, targetIndex);
+            }
+          } else {
+            moveMealToDay(
+              draggedItem.dayKey,
+              draggedItem.index,
+              dayKey,
+              targetIndex,
+            );
+          }
+
+          setDraggedItem(null);
+          setPlaceholderLocation(null);
+        }}
+        onDragLeave={(e) => {
+          if (e.currentTarget === e.target) setPlaceholderLocation(null);
         }}
       >
         <button
@@ -72,55 +129,141 @@ const WeekDayColumn = ({
             openMenuRecipe?.index === index;
 
           return (
-            <div
-              className={styles.draggableRecipeCard}
-              key={`${meal.recipeId}-${index}`}
-              draggable
-              onDragStart={() => setDraggedItem({ dayKey, index })}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={() => {
-                if (draggedItem) {
-                  // Same day reordering
+            <Fragment key={`${meal.recipeId}-${index}`}>
+              {placeholderIndex === index && (
+                <div
+                  className={`${styles.dropPlaceholder} ${styles.dropPlaceholderActive}`}
+                >
+                  <div className={styles.dropPlaceholderInner}>
+                    <span className={styles.dropPlaceholderLabel}>
+                      Drop here
+                    </span>
+                  </div>
+                </div>
+              )}
+              <div
+                className={`${styles.draggableRecipeCard} ${
+                  isDragged ? styles.dragSourceCollapsed : ""
+                }`}
+                draggable
+                onDragStart={(e) => {
+                  cleanupDragGhost();
+                  const card = e.currentTarget.cloneNode(true) as HTMLElement;
+                  card.style.position = "absolute";
+                  card.style.top = "-9999px";
+                  card.style.left = "-9999px";
+                  card.style.width = `${e.currentTarget.offsetWidth}px`;
+                  card.style.pointerEvents = "none";
+                  card.style.opacity = "0.95";
+                  document.body.appendChild(card);
+                  dragImageRef.current = card;
+                  e.dataTransfer.setDragImage(
+                    card,
+                    e.clientX - e.currentTarget.getBoundingClientRect().left,
+                    e.clientY - e.currentTarget.getBoundingClientRect().top,
+                  );
+                  e.dataTransfer.effectAllowed = "move";
+                  requestAnimationFrame(() => {
+                    setDraggedItem({ dayKey, index });
+                  });
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setPlaceholderIfChanged(dayKey, getDropIndex(e, index));
+                }}
+                onDrop={(e) => {
+                  e.stopPropagation();
+                  if (!draggedItem) {
+                    setPlaceholderLocation(null);
+                    return;
+                  }
+                  const dropIndex =
+                    placeholderLocation?.dayKey === dayKey
+                      ? placeholderLocation.index
+                      : getDropIndex(e, index);
                   if (
                     draggedItem.dayKey === dayKey &&
-                    draggedItem.index !== index
+                    draggedItem.index !== dropIndex
                   ) {
-                    reorderMeal(dayKey, draggedItem.index, index);
-                  }
-                  // Cross-day move
-                  else if (draggedItem.dayKey !== dayKey) {
+                    reorderMeal(dayKey, draggedItem.index, dropIndex);
+                  } else if (draggedItem.dayKey !== dayKey) {
                     moveMealToDay(
                       draggedItem.dayKey,
                       draggedItem.index,
                       dayKey,
+                      dropIndex,
                     );
                   }
                   setDraggedItem(null);
-                }
-              }}
-              onDragEnd={() => setDraggedItem(null)}
-              style={{
-                opacity: isDragged ? 0.5 : 1,
-                cursor: isDragged ? "grabbing" : "grab",
-              }}
-            >
-              <RecipeCard
-                className={styles.recipeCard}
-                title={title}
-                tags={tags}
-                type="calendar"
-                mealType={mealType}
-                handleOnDeleteRecipeItem={() => removeMeal(dayKey, index)}
-                handleOnDuplicateRecipeItem={() => duplicateMeal(dayKey, index)}
-                handleOnMoreOptionsButton={() =>
-                  toggleMoreOptionsMenu(dayKey, index)
-                }
-                showMoreOptionsMenu={isMenuOpen}
-                handleOnTitleClick={() => viewRecipe(meal.recipeId)}
-              />
-            </div>
+                  setPlaceholderLocation(null);
+                }}
+                onDragEnd={() => {
+                  cleanupDragGhost();
+                  setDraggedItem(null);
+                  setPlaceholderLocation(null);
+                }}
+                style={{
+                  cursor: isDragged ? "grabbing" : "grab",
+                }}
+              >
+                <RecipeCard
+                  className={styles.recipeCard}
+                  title={title}
+                  tags={tags}
+                  type="calendar"
+                  mealType={mealType}
+                  handleOnDeleteRecipeItem={() => removeMeal(dayKey, index)}
+                  handleOnDuplicateRecipeItem={() =>
+                    duplicateMeal(dayKey, index)
+                  }
+                  handleOnMoreOptionsButton={() =>
+                    toggleMoreOptionsMenu(dayKey, index)
+                  }
+                  showMoreOptionsMenu={isMenuOpen}
+                  handleOnTitleClick={() => viewRecipe(meal.recipeId)}
+                />
+              </div>
+            </Fragment>
           );
         })}
+        <div
+          className={`${styles.bottomDropZone} ${
+            placeholderIndex === meals.length
+              ? styles.dropPlaceholderActive
+              : ""
+          }`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            if (draggedItem) {
+              setPlaceholderIfChanged(dayKey, meals.length);
+            }
+          }}
+          onDrop={(e) => {
+            e.stopPropagation();
+            if (!draggedItem) {
+              setPlaceholderLocation(null);
+              return;
+            }
+            const dropIndex = meals.length;
+            if (draggedItem.dayKey === dayKey) {
+              if (draggedItem.index !== dropIndex) {
+                reorderMeal(dayKey, draggedItem.index, dropIndex);
+              }
+            } else {
+              moveMealToDay(
+                draggedItem.dayKey,
+                draggedItem.index,
+                dayKey,
+                dropIndex,
+              );
+            }
+            setDraggedItem(null);
+            setPlaceholderLocation(null);
+          }}
+          onDragLeave={(e) => {
+            if (e.currentTarget === e.target) setPlaceholderLocation(null);
+          }}
+        />
       </div>
     </div>
   );
@@ -138,6 +281,10 @@ const Week = () => {
   } | null>(null);
   const [openAddRecipeDrawer, setOpenAddRecipeDrawer] = useState(false);
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
+  const [placeholderLocation, setPlaceholderLocation] = useState<{
+    dayKey: DaysProps;
+    index: number;
+  } | null>(null);
   const weekContainerRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -223,7 +370,8 @@ const Week = () => {
         if (day.dayKey !== dayKey) return day;
         const newMeals = [...day.meals];
         const [movedMeal] = newMeals.splice(fromIndex, 1);
-        newMeals.splice(toIndex, 0, movedMeal);
+        const insertionIndex = fromIndex < toIndex ? toIndex - 1 : toIndex;
+        newMeals.splice(insertionIndex, 0, movedMeal);
         return { ...day, meals: newMeals };
       });
     });
@@ -247,6 +395,7 @@ const Week = () => {
     fromDayKey: DaysProps,
     fromIndex: number,
     toDayKey: DaysProps,
+    toIndex?: number,
   ) => {
     setWeekData((prev) => {
       const sourceDay = prev.find((day) => day.dayKey === fromDayKey);
@@ -265,9 +414,13 @@ const Week = () => {
         }
 
         if (day.dayKey === toDayKey) {
+          const insertionIndex =
+            typeof toIndex === "number" ? toIndex : day.meals.length;
+          const nextMeals = [...day.meals];
+          nextMeals.splice(insertionIndex, 0, mealToMove);
           return {
             ...day,
-            meals: [...day.meals, mealToMove],
+            meals: nextMeals,
           };
         }
 
@@ -345,6 +498,8 @@ const Week = () => {
             draggedItem={draggedItem}
             setDraggedItem={setDraggedItem}
             toggleMoreOptionsMenu={toggleMoreOptionsMenu}
+            placeholderLocation={placeholderLocation}
+            setPlaceholderLocation={setPlaceholderLocation}
             openMenuRecipe={openMenuRecipe}
             openAddRecipeDrawer={openAddRecipeDrawer}
             viewRecipe={viewRecipe}
