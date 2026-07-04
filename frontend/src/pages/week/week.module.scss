@@ -103,12 +103,18 @@
 
       .draggableRecipeCard {
         position: relative;
+        overflow: visible;
+        isolation: isolate;
         transition:
           transform 0.2s ease,
           margin 0.2s ease,
           opacity 0.2s ease,
           height 0.2s ease;
         will-change: transform, margin, opacity, height;
+
+        &.menuOpen {
+          z-index: 20;
+        }
 
         &.dragSourceCollapsed {
           max-height: 0;

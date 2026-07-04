@@ -1,10 +1,13 @@
 .recipeCard {
-  // overflow: hidden;
+  overflow: visible;
   background-color: var(--dark-medium-color);
   position: relative;
   border: 1px solid var(--dark-light-color);
   border-radius: 8px;
-  // cursor: pointer;
+
+  &.menuOpen {
+    z-index: 20;
+  }
 
   &:hover {
     .moreOptionsButton {
@@ -48,6 +51,7 @@
 
 .moreOptionsContainer {
   position: relative;
+  z-index: 2;
 }
 
 .moreOptionsMenu {
@@ -61,7 +65,7 @@
   background-color: var(--dark-medium-color);
   border: 1px solid var(--light-color);
   border-radius: 8px 0 8px 8px;
-  z-index: 2;
+  z-index: 25;
   box-shadow: 0 2px 8px rgba(var(--dark-light-color-rgb), 0.8);
 
   .optionButton {

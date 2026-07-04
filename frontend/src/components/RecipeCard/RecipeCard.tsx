@@ -50,7 +50,10 @@ export const RecipeCard = ({
       </div>
     </div>
   ) : (
-    <div className={`${styles.recipeCard} ${className || ""}`} tabIndex={0}>
+    <div
+      className={`${styles.recipeCard} ${className || ""} ${showMoreOptionsMenu ? styles.menuOpen : ""}`}
+      tabIndex={0}
+    >
       <div className={styles.recipeDetails}>
         <div className={styles.recipeHeader}>
           <Tag label={mealType} />

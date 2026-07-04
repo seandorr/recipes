@@ -146,7 +146,7 @@ const WeekDayColumn = ({
               <div
                 className={`${styles.draggableRecipeCard} ${
                   isDragged ? styles.dragSourceCollapsed : ""
-                }`}
+                } ${isMenuOpen ? styles.menuOpen : ""}`}
                 draggable
                 onDragStart={(e) => {
                   setDragImage(e);
