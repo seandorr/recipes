@@ -146,22 +146,22 @@
         align-items: center;
         justify-content: center;
         opacity: 1;
-      }
 
-      .dropPlaceholderInner {
-        width: calc(100% - 1rem);
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        background-color: rgba(var(--light-color-rgb), 0.08);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+        .dropPlaceholderInner {
+          width: calc(100% - 1rem);
+          padding: 0.75rem 1rem;
+          border-radius: 6px;
+          background-color: rgba(var(--light-color-rgb), 0.08);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
 
-      .dropPlaceholderLabel {
-        color: var(--light-color);
-        font-size: 0.9rem;
-        opacity: 0.9;
+        .dropPlaceholderLabel {
+          color: var(--light-color);
+          font-size: 0.9rem;
+          opacity: 0.9;
+        }
       }
 
       .bottomDropZone {
@@ -181,12 +181,6 @@
           opacity: 1;
           min-height: 100px;
         }
-      }
-
-      .dropPlaceholderActive {
-        border: 2px dashed var(--light-color);
-        background-color: rgba(var(--light-color-rgb), 0.08);
-        opacity: 1;
       }
 
       .recipeCard {

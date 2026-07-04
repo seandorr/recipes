@@ -4,6 +4,7 @@ import { RecipeDrawer } from "../../components/RecipeDrawer";
 import { useClickOutside } from "../../utils/hooks/useClickOutside";
 import { useEscapePress } from "../../utils/hooks/useEscapePress";
 import { activeDay } from "../../utils/functions/getDay";
+import { useWeekDrag } from "./useWeekDrag";
 import styles from "./week.module.scss";
 import { Tag } from "../../components/Tag";
 import { recipes, initialWeekDays } from "../../utils/constants/recipes";
@@ -33,16 +34,11 @@ const WeekDayColumn = ({
   openAddRecipeDrawer,
   viewRecipe,
 }: WeekDayColumnProps) => {
-  const dragImageRef = useRef<HTMLElement | null>(null);
+  const { cleanupDragGhost, setDragImage } = useWeekDrag();
   const placeholderIndex =
     placeholderLocation?.dayKey === dayKey ? placeholderLocation.index : null;
 
-  const cleanupDragGhost = () => {
-    if (dragImageRef.current) {
-      document.body.removeChild(dragImageRef.current);
-      dragImageRef.current = null;
-    }
-  };
+  const clearPlaceholder = () => setPlaceholderLocation(null);
 
   const getDropIndex = (e: DragEvent<HTMLDivElement>, index: number) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -51,7 +47,7 @@ const WeekDayColumn = ({
     return Math.min(nextIndex, meals.length);
   };
 
-  const setPlaceholderIfChanged = (dayKey: DaysProps, index: number) => {
+  const setPlaceholderIfChanged = (index: number) => {
     if (
       placeholderLocation?.dayKey !== dayKey ||
       placeholderLocation?.index !== index
@@ -59,6 +55,35 @@ const WeekDayColumn = ({
       setPlaceholderLocation({ dayKey, index });
     }
   };
+
+  const commitDrop = (targetIndex: number) => {
+    if (!draggedItem) return;
+
+    if (draggedItem.dayKey === dayKey) {
+      if (draggedItem.index !== targetIndex) {
+        reorderMeal(dayKey, draggedItem.index, targetIndex);
+      }
+      return;
+    }
+
+    moveMealToDay(draggedItem.dayKey, draggedItem.index, dayKey, targetIndex);
+  };
+
+  const finalizeDrag = () => {
+    cleanupDragGhost();
+    setDraggedItem(null);
+    clearPlaceholder();
+  };
+
+  const renderPlaceholder = () => (
+    <div
+      className={`${styles.dropPlaceholder} ${styles.dropPlaceholderActive}`}
+    >
+      <div className={styles.dropPlaceholderInner}>
+        <span className={styles.dropPlaceholderLabel}>Drop here</span>
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -77,12 +102,12 @@ const WeekDayColumn = ({
         onDragOver={(e) => {
           e.preventDefault();
           if (draggedItem && e.currentTarget === e.target) {
-            setPlaceholderLocation({ dayKey, index: meals.length });
+            setPlaceholderIfChanged(meals.length);
           }
         }}
         onDrop={() => {
           if (!draggedItem) {
-            setPlaceholderLocation(null);
+            clearPlaceholder();
             return;
           }
 
@@ -90,24 +115,11 @@ const WeekDayColumn = ({
             placeholderLocation?.dayKey === dayKey
               ? placeholderLocation.index
               : meals.length;
-          if (draggedItem.dayKey === dayKey) {
-            if (draggedItem.index !== targetIndex) {
-              reorderMeal(dayKey, draggedItem.index, targetIndex);
-            }
-          } else {
-            moveMealToDay(
-              draggedItem.dayKey,
-              draggedItem.index,
-              dayKey,
-              targetIndex,
-            );
-          }
-
-          setDraggedItem(null);
-          setPlaceholderLocation(null);
+          commitDrop(targetIndex);
+          finalizeDrag();
         }}
         onDragLeave={(e) => {
-          if (e.currentTarget === e.target) setPlaceholderLocation(null);
+          if (e.currentTarget === e.target) clearPlaceholder();
         }}
       >
         <button
@@ -130,78 +142,36 @@ const WeekDayColumn = ({
 
           return (
             <Fragment key={`${meal.recipeId}-${index}`}>
-              {placeholderIndex === index && (
-                <div
-                  className={`${styles.dropPlaceholder} ${styles.dropPlaceholderActive}`}
-                >
-                  <div className={styles.dropPlaceholderInner}>
-                    <span className={styles.dropPlaceholderLabel}>
-                      Drop here
-                    </span>
-                  </div>
-                </div>
-              )}
+              {placeholderIndex === index && renderPlaceholder()}
               <div
                 className={`${styles.draggableRecipeCard} ${
                   isDragged ? styles.dragSourceCollapsed : ""
                 }`}
                 draggable
                 onDragStart={(e) => {
-                  cleanupDragGhost();
-                  const card = e.currentTarget.cloneNode(true) as HTMLElement;
-                  card.style.position = "absolute";
-                  card.style.top = "-9999px";
-                  card.style.left = "-9999px";
-                  card.style.width = `${e.currentTarget.offsetWidth}px`;
-                  card.style.pointerEvents = "none";
-                  card.style.opacity = "0.95";
-                  document.body.appendChild(card);
-                  dragImageRef.current = card;
-                  e.dataTransfer.setDragImage(
-                    card,
-                    e.clientX - e.currentTarget.getBoundingClientRect().left,
-                    e.clientY - e.currentTarget.getBoundingClientRect().top,
-                  );
-                  e.dataTransfer.effectAllowed = "move";
+                  setDragImage(e);
                   requestAnimationFrame(() => {
                     setDraggedItem({ dayKey, index });
                   });
                 }}
                 onDragOver={(e) => {
                   e.preventDefault();
-                  setPlaceholderIfChanged(dayKey, getDropIndex(e, index));
+                  setPlaceholderIfChanged(getDropIndex(e, index));
                 }}
                 onDrop={(e) => {
                   e.stopPropagation();
                   if (!draggedItem) {
-                    setPlaceholderLocation(null);
+                    clearPlaceholder();
                     return;
                   }
                   const dropIndex =
                     placeholderLocation?.dayKey === dayKey
                       ? placeholderLocation.index
                       : getDropIndex(e, index);
-                  if (
-                    draggedItem.dayKey === dayKey &&
-                    draggedItem.index !== dropIndex
-                  ) {
-                    reorderMeal(dayKey, draggedItem.index, dropIndex);
-                  } else if (draggedItem.dayKey !== dayKey) {
-                    moveMealToDay(
-                      draggedItem.dayKey,
-                      draggedItem.index,
-                      dayKey,
-                      dropIndex,
-                    );
-                  }
-                  setDraggedItem(null);
-                  setPlaceholderLocation(null);
+                  commitDrop(dropIndex);
+                  finalizeDrag();
                 }}
-                onDragEnd={() => {
-                  cleanupDragGhost();
-                  setDraggedItem(null);
-                  setPlaceholderLocation(null);
-                }}
+                onDragEnd={finalizeDrag}
                 style={{
                   cursor: isDragged ? "grabbing" : "grab",
                 }}
@@ -235,33 +205,20 @@ const WeekDayColumn = ({
           onDragOver={(e) => {
             e.preventDefault();
             if (draggedItem) {
-              setPlaceholderIfChanged(dayKey, meals.length);
+              setPlaceholderIfChanged(meals.length);
             }
           }}
           onDrop={(e) => {
             e.stopPropagation();
             if (!draggedItem) {
-              setPlaceholderLocation(null);
+              clearPlaceholder();
               return;
             }
-            const dropIndex = meals.length;
-            if (draggedItem.dayKey === dayKey) {
-              if (draggedItem.index !== dropIndex) {
-                reorderMeal(dayKey, draggedItem.index, dropIndex);
-              }
-            } else {
-              moveMealToDay(
-                draggedItem.dayKey,
-                draggedItem.index,
-                dayKey,
-                dropIndex,
-              );
-            }
-            setDraggedItem(null);
-            setPlaceholderLocation(null);
+            commitDrop(meals.length);
+            finalizeDrag();
           }}
           onDragLeave={(e) => {
-            if (e.currentTarget === e.target) setPlaceholderLocation(null);
+            if (e.currentTarget === e.target) clearPlaceholder();
           }}
         />
       </div>
