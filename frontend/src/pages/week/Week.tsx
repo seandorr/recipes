@@ -37,6 +37,10 @@ const WeekDayColumn = ({
   const { cleanupDragGhost, setDragImage } = useWeekDrag();
   const placeholderIndex =
     placeholderLocation?.dayKey === dayKey ? placeholderLocation.index : null;
+  const showBottomDropZone =
+    Boolean(draggedItem) &&
+    placeholderLocation?.dayKey === dayKey &&
+    placeholderLocation.index === meals.length;
 
   const clearPlaceholder = () => setPlaceholderLocation(null);
 
@@ -78,11 +82,7 @@ const WeekDayColumn = ({
   const renderPlaceholder = () => (
     <div
       className={`${styles.dropPlaceholder} ${styles.dropPlaceholderActive}`}
-    >
-      <div className={styles.dropPlaceholderInner}>
-        <span className={styles.dropPlaceholderLabel}>Drop here</span>
-      </div>
-    </div>
+    ></div>
   );
 
   return (
@@ -196,31 +196,33 @@ const WeekDayColumn = ({
             </Fragment>
           );
         })}
-        <div
-          className={`${styles.bottomDropZone} ${
-            placeholderIndex === meals.length
-              ? styles.dropPlaceholderActive
-              : ""
-          }`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            if (draggedItem) {
-              setPlaceholderIfChanged(meals.length);
-            }
-          }}
-          onDrop={(e) => {
-            e.stopPropagation();
-            if (!draggedItem) {
-              clearPlaceholder();
-              return;
-            }
-            commitDrop(meals.length);
-            finalizeDrag();
-          }}
-          onDragLeave={(e) => {
-            if (e.currentTarget === e.target) clearPlaceholder();
-          }}
-        />
+        {showBottomDropZone && (
+          <div
+            className={`${styles.bottomDropZone} ${
+              placeholderIndex === meals.length
+                ? styles.dropPlaceholderActive
+                : ""
+            }`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              if (draggedItem) {
+                setPlaceholderIfChanged(meals.length);
+              }
+            }}
+            onDrop={(e) => {
+              e.stopPropagation();
+              if (!draggedItem) {
+                clearPlaceholder();
+                return;
+              }
+              commitDrop(meals.length);
+              finalizeDrag();
+            }}
+            onDragLeave={(e) => {
+              if (e.currentTarget === e.target) clearPlaceholder();
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -291,7 +293,7 @@ const Week = () => {
         day.dayKey === dayKey
           ? {
               ...day,
-              meals: [...day.meals, newMeal],
+              meals: [newMeal, ...day.meals],
             }
           : day,
       );
